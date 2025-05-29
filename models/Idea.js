@@ -13,7 +13,6 @@ const ideaSchema = new mongoose.Schema({
     startupName: String,
     industry: String,
     website: String,
-    likes: [{ type: String}],
     comment: [
         {
             username: String,
