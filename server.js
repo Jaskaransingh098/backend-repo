@@ -16,7 +16,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: "https://innolinkk.netlify.app",
-        methods: ["GET", 'POST']
+        methods: ["GET", 'POST', 'PUT', 'DELETE', 'OPTIONS']
     }
 });
 
@@ -24,7 +24,7 @@ const io = new Server(server, {
 // app.use(cors());
 app.use(cors({
     origin: 'https://innolinkk.netlify.app',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', "PUT", "DELETE", "OPTIONS"],
     credentials: true
 }));
 app.use(express.json())
