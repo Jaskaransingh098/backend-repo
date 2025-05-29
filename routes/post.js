@@ -34,6 +34,7 @@ router.post('/', authenticateToken, async (req, res) => {
         industry,
         website: website || null,
         comment: [],
+        likes: [],
         createdAt: new Date(),
     });
     await newIdea.save();
@@ -93,7 +94,7 @@ router.post('/:id/comments', authenticateToken, async(req, res) => {
     if (!text) return res.status(400).json({ msg: 'Comment text required' });
 
     try {
-        const idea = await Idea.findById(req.params.id);
+        const idea = await idea.findById(req.params.id);
         if (!idea) return res.status(404).json({ msg: 'Post not found' });
 
         const comment = {
@@ -133,7 +134,7 @@ router.post('/:id/comments', authenticateToken, async(req, res) => {
 })
 router.put('/:id/like', authenticateToken, async (req, res) => {
     try {
-        const idea = await Idea.findById(req.params.id);
+        const idea = await idea.findById(req.params.id);
         if (!idea) return res.status(404).json({ msg: 'Post not found' });
 
         const username = req.user.username;
