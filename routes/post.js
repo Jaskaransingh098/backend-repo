@@ -88,7 +88,7 @@ router.delete('/:id', authenticateToken, (req, res) => {
     res.status(200).json({ msg: 'Post deleted successfully ' });
 })
 //comment post
-router.post('/:id/comments', authenticateToken, (req, res) => {
+router.post('/:id/comments', authenticateToken, async(req, res) => {
     const { text } = req.body;
     if (!text) return res.status(400).json({ msg: 'Comment text required' });
 
