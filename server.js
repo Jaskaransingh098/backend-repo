@@ -15,13 +15,18 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "https://innolinkk.netlify.app",
         methods: ["GET", 'POST']
     }
 });
 
 //Middleware
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+    origin: 'https://innolinkk.netlify.app',
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
 app.use(express.json())
 //Routes
 app.use("/api/auth", authRoutes);

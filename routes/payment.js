@@ -23,8 +23,8 @@ router.post('/create-payment-session', authenticateToken, async(req,res) => {
                     quantity: 1,
                 },
             ],
-            success_url: 'http://localhost:5173/success',
-            cancel_url: 'http://localhost:5173/success'
+            success_url: 'https://innolinkk.netlify.app/success',
+            cancel_url: 'https://innolinkk.netlify.app/success'
         });
         res.json({ url: session.url});
     } catch(err){
