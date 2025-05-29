@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router();
 const authenticateToken = require('../middleware/authenticateToken');
-
-let submittedIdeas = [];
+const idea = require('../models/Idea')
+// let submittedIdeas = [];
 
 //submit new idea
-router.post('/',authenticateToken, (req,res) => { 
+router.post('/',authenticateToken, async(req,res) => { 
     const {topic, description, stage, market, goals, fullName, email, role, startupName, industry, website} = req.body;
 
     const user = req.user;
@@ -36,7 +36,7 @@ router.post('/',authenticateToken, (req,res) => {
         comment: [],
         createdAt: new Date(),
     };
-    submittedIdeas.push(newIdea);
+    await newIdea.save();
 
     res.status(201).json({ msg: 'Idea submitted successfully!', idea: newIdea});
 });
