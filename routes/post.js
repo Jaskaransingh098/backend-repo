@@ -160,4 +160,26 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
     }
 })
 
+router.put('/:id/likes', authenticateToken, async (req, res)=> {
+    const {id} = req.params;
+    const user = req.user;
+
+    try{
+        const existingIdea = await idea.findById(id);
+        if(!existingIdea) return res.status(404).json({ msg: 'Post not found'});
+
+        const { likes } = req.body;
+        if (typeof likes !== 'number'){
+            return res.status(400).json({ msg: 'Likes must be a number'});
+        }
+
+        existingIdea.likes = likes;
+        await existingIdea.save();
+
+        res.status(200).json({ msg: 'Likes updated', likes: existingIdea.likes});
+    } catch(error){
+        res.status(500).json({ msg: 'Server error', error: error.message})
+    }
+})
+
 module.exports = router;
