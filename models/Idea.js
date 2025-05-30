@@ -20,6 +20,7 @@ const ideaSchema = new mongoose.Schema({
             createdAt: { type: Date, default: Date.now }
         }
     ],
+    likes: [{ username: String}],
     createdAt: { type: Date, default: Date.now },
 });
 
