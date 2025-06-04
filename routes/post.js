@@ -135,7 +135,7 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
             createdAt: new Date(),
         };
 
-        foundIdea.comment.push(comment);
+        foundIdea.comments.push(comment);
         await foundIdea.save();
 
         res.status(201).json({ msg: 'Comment added', comment });
@@ -146,7 +146,7 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
 });
 router.post('/:id/like', authenticateToken, async (req, res) => {
     const { id } = req.params;
-    const user = req.user;
+    
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ msg: 'Invalid post ID' });
@@ -158,18 +158,12 @@ router.post('/:id/like', authenticateToken, async (req, res) => {
             return res.status(404).json({ msg: 'Post not found' });
         }
 
-        const alreadyLiked = foundIdea.likes.find(like => like.username === user.username);
+        foundIdea.likes += 1;
 
-        if (alreadyLiked) {
-            // Remove like
-            foundIdea.likes = foundIdea.likes.filter(like => like.username !== user.username);
-        } else {
-            // Add like
-            foundIdea.likes.push({ username: user.username });
-        }
+        
 
         await foundIdea.save();
-        res.status(200).json({ msg: 'Like status updated', likes: foundIdea.likes });
+        res.status(200).json({ msg: 'Post Liked', likes: foundIdea.likes });
     } catch (error) {
         console.error('Error toggling like:', error);
         res.status(500).json({ msg: 'Internal Server Error' });
@@ -209,7 +203,7 @@ router.get('/:id/comments', async (req, res) => {
             return res.status(404).json({ msg: 'Post not found' });
         }
 
-        res.status(200).json({ comments: foundIdea.comment || [] });
+        res.status(200).json({ comments: foundIdea.comments });
     } catch (error) {
         console.error('Error fetching comments:', error);
         res.status(500).json({ msg: 'Internal Server Error' });

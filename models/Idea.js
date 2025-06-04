@@ -13,14 +13,14 @@ const ideaSchema = new mongoose.Schema({
     startupName: String,
     industry: String,
     website: String,
-    comment: [
+    comments: [
         {
             username: String,
             text: String,
             createdAt: { type: Date, default: Date.now }
         }
     ],
-    likes: [{ username: String}],
+    likes: { type: Number, default: 0},
     createdAt: { type: Date, default: Date.now },
 });
 
