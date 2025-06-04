@@ -20,7 +20,11 @@ const ideaSchema = new mongoose.Schema({
             createdAt: { type: Date, default: Date.now }
         }
     ],
-    likes: { type: Number, default: 0},
+    likes: [
+        {
+            type: String, // or ObjectId if you want to reference user
+        },
+    ],
     createdAt: { type: Date, default: Date.now },
 });
 

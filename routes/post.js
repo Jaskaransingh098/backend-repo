@@ -111,62 +111,71 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 
 // ✅ Add comment to post
 router.post('/:id/comments', authenticateToken, async (req, res) => {
-    const { id } = req.params;
-    const { text } = req.body;
-    const user = req.user;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ msg: 'Invalid post ID' });
-    }
-
-    if (!text || text.trim() === '') {
-        return res.status(400).json({ msg: 'Comment text is required' });
-    }
-
     try {
-        const foundIdea = await idea.findById(id);
-        if (!foundIdea) {
-            return res.status(404).json({ msg: 'Post not found' });
-        }
-
-        const comment = {
-            username: user.username,
-            text,
-            createdAt: new Date(),
+        const post = await Idea.findById(req.params.id);
+        const newComment = {
+            username: req.user.username,
+            text: req.body.text,
         };
 
-        foundIdea.comments.push(comment);
-        await foundIdea.save();
+        post.comments.push(newComment);
+        await post.save();
 
-        res.status(201).json({ msg: 'Comment added', comment });
-    } catch (error) {
-        console.error('Error adding comment:', error);
-        res.status(500).json({ msg: 'Internal Server Error' });
+        res.status(201).json(newComment);
+    } catch (err) {
+        console.error("Error adding comment:", err);
+        res.status(500).json({ message: "Internal server error" });
     }
+    // const { id } = req.params;
+    // const { text } = req.body;
+    // const user = req.user;
+
+    // if (!mongoose.Types.ObjectId.isValid(id)) {
+    //     return res.status(400).json({ msg: 'Invalid post ID' });
+    // }
+
+    // if (!text || text.trim() === '') {
+    //     return res.status(400).json({ msg: 'Comment text is required' });
+    // }
+
+    // try {
+    //     const foundIdea = await idea.findById(id);
+    //     if (!foundIdea) {
+    //         return res.status(404).json({ msg: 'Post not found' });
+    //     }
+
+    //     const comment = {
+    //         username: user.username,
+    //         text,
+    //         createdAt: new Date(),
+    //     };
+
+    //     foundIdea.comments.push(comment);
+    //     await foundIdea.save();
+
+    //     res.status(201).json({ msg: 'Comment added', comment });
+    // } catch (error) {
+    //     console.error('Error adding comment:', error);
+    //     res.status(500).json({ msg: 'Internal Server Error' });
+    // }
 });
 router.post('/:id/like', authenticateToken, async (req, res) => {
-    const { id } = req.params;
-    
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ msg: 'Invalid post ID' });
-    }
-
     try {
-        const foundIdea = await idea.findById(id);
-        if (!foundIdea) {
-            return res.status(404).json({ msg: 'Post not found' });
+        const post = await idea.findById(req.params.id);
+        const user = req.user.username; // or user._id
+
+        const index = post.likes.indexOf(user);
+        if (index === -1) {
+            post.likes.push(user); // Like
+        } else {
+            post.likes.splice(index, 1); // Unlike
         }
 
-        foundIdea.likes += 1;
-
-        
-
-        await foundIdea.save();
-        res.status(200).json({ msg: 'Post Liked', likes: foundIdea.likes });
-    } catch (error) {
-        console.error('Error toggling like:', error);
-        res.status(500).json({ msg: 'Internal Server Error' });
+        await post.save();
+        res.json({ likes: post.likes });
+    } catch (err) {
+        console.error("Error toggling like:", err);
+        res.status(500).json({ message: "Internal server error" });
     }
 });
 router.get('/:id/liked', authenticateToken, async (req, res) => {
@@ -183,7 +192,7 @@ router.get('/:id/liked', authenticateToken, async (req, res) => {
             return res.status(404).json({ msg: 'Post not found' });
         }
 
-        const liked = foundIdea.likes.some(like => like.username === user.username);
+        const liked = foundIdea.likes.includes(user.username);
         res.status(200).json({ liked });
     } catch (error) {
         console.error('Error checking like status:', error);
