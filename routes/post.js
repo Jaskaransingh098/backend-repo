@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const authenticateToken = require('../middleware/authenticateToken');
-const Idea = require('../models/Idea');
+const idea = require('../models/Idea');
 
-// ✅ Submit new Idea
+// ✅ Submit new idea
 router.post('/', authenticateToken, async (req, res) => {
     const { topic, description, stage, market, goals, fullName, email, role, startupName, industry, website } = req.body;
     const user = req.user;
@@ -17,7 +17,7 @@ router.post('/', authenticateToken, async (req, res) => {
         return res.status(400).json({ msg: 'Please fill out all required fields.' });
     }
 
-    const newIdea = new Idea({
+    const newidea = new idea({
         username: user.username,
         topic,
         description,
@@ -34,15 +34,15 @@ router.post('/', authenticateToken, async (req, res) => {
         createdAt: new Date(),
     });
 
-    await newIdea.save();
-    res.status(201).json({ msg: 'Idea submitted successfully!', Idea: newIdea });
+    await newidea.save();
+    res.status(201).json({ msg: 'idea submitted successfully!', idea: newidea });
 });
 
-// ✅ Get all Ideas
+// ✅ Get all ideas
 router.get('/', async (req, res) => {
     try {
-        const Ideas = await Idea.find();
-        res.status(200).json({ Ideas });
+        const ideas = await idea.find();
+        res.status(200).json({ ideas });
     } catch (error) {
         res.status(500).json({ msg: 'Server error', error: error.message });
     }
@@ -59,12 +59,12 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 
     try {
-        const foundIdea = await Idea.findById(id);
-        if (!foundIdea) {
+        const foundidea = await idea.findById(id);
+        if (!foundidea) {
             return res.status(404).json({ msg: 'Post not found' });
         }
 
-        if (foundIdea.username !== user.username) {
+        if (foundidea.username !== user.username) {
             return res.status(403).json({ msg: 'Forbidden: Not your post' });
         }
 
@@ -72,10 +72,10 @@ router.put('/:id', authenticateToken, async (req, res) => {
             return res.status(400).json({ msg: 'Description is required' });
         }
 
-        foundIdea.description = description;
-        await foundIdea.save();
+        foundidea.description = description;
+        await foundidea.save();
 
-        res.status(200).json({ msg: 'Post updated successfully', Idea: foundIdea });
+        res.status(200).json({ msg: 'Post updated successfully', idea: foundidea });
     } catch (error) {
         console.error('Error updating post:', error);
         res.status(500).json({ msg: 'Internal Server Error' });
@@ -92,16 +92,16 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     }
 
     try {
-        const foundIdea = await Idea.findById(id);
-        if (!foundIdea) {
+        const foundidea = await idea.findById(id);
+        if (!foundidea) {
             return res.status(404).json({ msg: 'Post not found' });
         }
 
-        if (foundIdea.username !== user.username) {
+        if (foundidea.username !== user.username) {
             return res.status(403).json({ msg: 'Forbidden: Not your post' });
         }
 
-        await Idea.findByIdAndDelete(id);
+        await idea.findByIdAndDelete(id);
         res.status(200).json({ msg: 'Post deleted successfully' });
     } catch (error) {
         console.error('Error deleting post:', error);
@@ -112,7 +112,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 // ✅ Add comment to post
 router.post('/:id/comments', authenticateToken, async (req, res) => {
     try {
-        const post = await Idea.findById(req.params.id);
+        const post = await idea.findById(req.params.id);
         const newComment = {
             username: req.user.username,
             text: req.body.text,
@@ -139,8 +139,8 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
     // }
 
     // try {
-    //     const foundIdea = await Idea.findById(id);
-    //     if (!foundIdea) {
+    //     const foundidea = await idea.findById(id);
+    //     if (!foundidea) {
     //         return res.status(404).json({ msg: 'Post not found' });
     //     }
 
@@ -150,8 +150,8 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
     //         createdAt: new Date(),
     //     };
 
-    //     foundIdea.comments.push(comment);
-    //     await foundIdea.save();
+    //     foundidea.comments.push(comment);
+    //     await foundidea.save();
 
     //     res.status(201).json({ msg: 'Comment added', comment });
     // } catch (error) {
@@ -161,7 +161,7 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
 });
 router.post('/:id/like', authenticateToken, async (req, res) => {
     try {
-        const post = await Idea.findById(req.params.id);
+        const post = await idea.findById(req.params.id);
         const user = req.user.username; // or user._id
 
         const index = post.likes.indexOf(user);
@@ -187,12 +187,12 @@ router.get('/:id/liked', authenticateToken, async (req, res) => {
     }
 
     try {
-        const foundIdea = await Idea.findById(id);
-        if (!foundIdea) {
+        const foundidea = await idea.findById(id);
+        if (!foundidea) {
             return res.status(404).json({ msg: 'Post not found' });
         }
 
-        const liked = foundIdea.likes.includes(user.username);
+        const liked = foundidea.likes.includes(user.username);
         res.status(200).json({ liked });
     } catch (error) {
         console.error('Error checking like status:', error);
@@ -207,12 +207,12 @@ router.get('/:id/comments', async (req, res) => {
     }
 
     try {
-        const foundIdea = await Idea.findById(id);
-        if (!foundIdea) {
+        const foundidea = await idea.findById(id);
+        if (!foundidea) {
             return res.status(404).json({ msg: 'Post not found' });
         }
 
-        res.status(200).json({ comments: foundIdea.comments });
+        res.status(200).json({ comments: foundidea.comments });
     } catch (error) {
         console.error('Error fetching comments:', error);
         res.status(500).json({ msg: 'Internal Server Error' });
