@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const authenticateToken = require('../middleware/authenticateToken');
-const idea = require('../models/Idea');
+const Idea = require('../models/Idea');
 
-// ✅ Submit new idea
+// ✅ Submit new Idea
 router.post('/', authenticateToken, async (req, res) => {
     const { topic, description, stage, market, goals, fullName, email, role, startupName, industry, website } = req.body;
     const user = req.user;
@@ -17,7 +17,7 @@ router.post('/', authenticateToken, async (req, res) => {
         return res.status(400).json({ msg: 'Please fill out all required fields.' });
     }
 
-    const newIdea = new idea({
+    const newIdea = new Idea({
         username: user.username,
         topic,
         description,
@@ -30,19 +30,19 @@ router.post('/', authenticateToken, async (req, res) => {
         startupName,
         industry,
         website: website || null,
-        comment: [],
+        comments: [],
         createdAt: new Date(),
     });
 
     await newIdea.save();
-    res.status(201).json({ msg: 'Idea submitted successfully!', idea: newIdea });
+    res.status(201).json({ msg: 'Idea submitted successfully!', Idea: newIdea });
 });
 
-// ✅ Get all ideas
+// ✅ Get all Ideas
 router.get('/', async (req, res) => {
     try {
-        const ideas = await idea.find();
-        res.status(200).json({ ideas });
+        const Ideas = await Idea.find();
+        res.status(200).json({ Ideas });
     } catch (error) {
         res.status(500).json({ msg: 'Server error', error: error.message });
     }
@@ -59,7 +59,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 
     try {
-        const foundIdea = await idea.findById(id);
+        const foundIdea = await Idea.findById(id);
         if (!foundIdea) {
             return res.status(404).json({ msg: 'Post not found' });
         }
@@ -75,7 +75,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
         foundIdea.description = description;
         await foundIdea.save();
 
-        res.status(200).json({ msg: 'Post updated successfully', idea: foundIdea });
+        res.status(200).json({ msg: 'Post updated successfully', Idea: foundIdea });
     } catch (error) {
         console.error('Error updating post:', error);
         res.status(500).json({ msg: 'Internal Server Error' });
@@ -92,7 +92,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     }
 
     try {
-        const foundIdea = await idea.findById(id);
+        const foundIdea = await Idea.findById(id);
         if (!foundIdea) {
             return res.status(404).json({ msg: 'Post not found' });
         }
@@ -101,7 +101,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
             return res.status(403).json({ msg: 'Forbidden: Not your post' });
         }
 
-        await idea.findByIdAndDelete(id);
+        await Idea.findByIdAndDelete(id);
         res.status(200).json({ msg: 'Post deleted successfully' });
     } catch (error) {
         console.error('Error deleting post:', error);
@@ -139,7 +139,7 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
     // }
 
     // try {
-    //     const foundIdea = await idea.findById(id);
+    //     const foundIdea = await Idea.findById(id);
     //     if (!foundIdea) {
     //         return res.status(404).json({ msg: 'Post not found' });
     //     }
@@ -161,7 +161,7 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
 });
 router.post('/:id/like', authenticateToken, async (req, res) => {
     try {
-        const post = await idea.findById(req.params.id);
+        const post = await Idea.findById(req.params.id);
         const user = req.user.username; // or user._id
 
         const index = post.likes.indexOf(user);
@@ -187,7 +187,7 @@ router.get('/:id/liked', authenticateToken, async (req, res) => {
     }
 
     try {
-        const foundIdea = await idea.findById(id);
+        const foundIdea = await Idea.findById(id);
         if (!foundIdea) {
             return res.status(404).json({ msg: 'Post not found' });
         }
@@ -207,7 +207,7 @@ router.get('/:id/comments', async (req, res) => {
     }
 
     try {
-        const foundIdea = await idea.findById(id);
+        const foundIdea = await Idea.findById(id);
         if (!foundIdea) {
             return res.status(404).json({ msg: 'Post not found' });
         }
