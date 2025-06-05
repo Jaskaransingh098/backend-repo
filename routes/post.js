@@ -83,7 +83,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 });
 router.get('/:id', async (req, res) => {
     try {
-        const idea = await Idea.findById(req.params.id);
+        const idea = await idea.findById(req.params.id);
         if (!idea) return res.status(404).json({ message: "Post not found" });
         res.status(200).json(idea);
     } catch (error) {
@@ -227,5 +227,22 @@ router.get('/:id/comments', async (req, res) => {
         res.status(500).json({ msg: 'Internal Server Error' });
     }
 });
+router.delete('/:id/comments', authenticateToken, async (req, res) => {
+    try {
+        const { text } = req.body;
+        const post = await idea.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
 
+        // Only delete your own comment
+        const user = req.user.username;
+        post.comments = post.comments.filter(
+            (c) => !(c.username === user && c.text === text)
+        );
+
+        await post.save();
+        res.status(200).json({ message: 'Comment deleted' });
+    } catch (err) {
+        res.status(500).json({ error: 'Error deleting comment' });
+    }
+});
 module.exports = router;
