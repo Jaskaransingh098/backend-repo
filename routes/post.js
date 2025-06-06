@@ -216,7 +216,7 @@ router.delete('/:id/comments', authenticateToken, async (req, res) => {
 router.put("/view/:id", authenticateToken, async (req, res) => {
     const { username } = req.user;
     try {
-        const post = await Idea.findById(req.params.id);
+        const post = await idea.findById(req.params.id);
         if (!post) return res.status(404).json({ message: "Post not found" });
 
         // Prevent multiple views from same user
