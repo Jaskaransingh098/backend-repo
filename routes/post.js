@@ -221,9 +221,9 @@ router.post("/:id/view", authenticateToken, async (req, res) => {
         if (!post) return res.status(404).json({ message: "Post not found" });
 
         // Optionally skip counting views for the post owner
-        if (post.username === username) {
-            return res.status(200).json({ views: post.views });
-        }
+        // if (post.username === username) {
+        //     return res.status(200).json({ views: post.views });
+        // }
 
         if (!post.viewedBy.includes(username)) {
             post.views += 1;
@@ -238,7 +238,7 @@ router.post("/:id/view", authenticateToken, async (req, res) => {
 });
 router.get("/views", async (req, res) => {
     try {
-        const posts = await idea.find({}, "title views"); // send title + views only
+        const posts = await idea.find({}, "topic views"); // send title + views only
         res.json(posts);
     } catch (err) {
         res.status(500).json({ message: "Error fetching views" });
