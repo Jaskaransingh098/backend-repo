@@ -213,20 +213,25 @@ router.delete('/:id/comments', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Error deleting comment' });
     }
 });
-router.put("/view/:id", authenticateToken, async (req, res) => {
+router.post("/:id/view", authenticateToken, async (req, res) => {
     const { username } = req.user;
+
     try {
         const post = await idea.findById(req.params.id);
         if (!post) return res.status(404).json({ message: "Post not found" });
 
-        // Prevent multiple views from same user
+        // Optionally skip counting views for the post owner
+        if (post.username === username) {
+            return res.status(200).json({ views: post.views });
+        }
+
         if (!post.viewedBy.includes(username)) {
             post.views += 1;
             post.viewedBy.push(username);
             await post.save();
         }
 
-        res.status(200).json(post);
+        res.status(200).json({ views: post.views });
     } catch (err) {
         res.status(500).json({ message: "Error incrementing views", error: err.message });
     }
