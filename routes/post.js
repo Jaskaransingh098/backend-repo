@@ -135,38 +135,6 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
         console.error("Error adding comment:", err);
         res.status(500).json({ message: "Internal server error" });
     }
-    // const { id } = req.params;
-    // const { text } = req.body;
-    // const user = req.user;
-
-    // if (!mongoose.Types.ObjectId.isValid(id)) {
-    //     return res.status(400).json({ msg: 'Invalid post ID' });
-    // }
-
-    // if (!text || text.trim() === '') {
-    //     return res.status(400).json({ msg: 'Comment text is required' });
-    // }
-
-    // try {
-    //     const foundidea = await idea.findById(id);
-    //     if (!foundidea) {
-    //         return res.status(404).json({ msg: 'Post not found' });
-    //     }
-
-    //     const comment = {
-    //         username: user.username,
-    //         text,
-    //         createdAt: new Date(),
-    //     };
-
-    //     foundidea.comments.push(comment);
-    //     await foundidea.save();
-
-    //     res.status(201).json({ msg: 'Comment added', comment });
-    // } catch (error) {
-    //     console.error('Error adding comment:', error);
-    //     res.status(500).json({ msg: 'Internal Server Error' });
-    // }
 });
 router.post('/:id/like', authenticateToken, async (req, res) => {
     try {
@@ -243,6 +211,32 @@ router.delete('/:id/comments', authenticateToken, async (req, res) => {
         res.status(200).json({ message: 'Comment deleted' });
     } catch (err) {
         res.status(500).json({ error: 'Error deleting comment' });
+    }
+});
+router.put("/view/:id", authenticateToken, async (req, res) => {
+    const { username } = req.user;
+    try {
+        const post = await Idea.findById(req.params.id);
+        if (!post) return res.status(404).json({ message: "Post not found" });
+
+        // Prevent multiple views from same user
+        if (!post.viewedBy.includes(username)) {
+            post.views += 1;
+            post.viewedBy.push(username);
+            await post.save();
+        }
+
+        res.status(200).json(post);
+    } catch (err) {
+        res.status(500).json({ message: "Error incrementing views", error: err.message });
+    }
+});
+router.get("/views", async (req, res) => {
+    try {
+        const posts = await idea.find({}, "title views"); // send title + views only
+        res.json(posts);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching views" });
     }
 });
 module.exports = router;

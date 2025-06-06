@@ -25,6 +25,15 @@ const ideaSchema = new mongoose.Schema({
             type: String, // or ObjectId if you want to reference user
         },
     ],
+    views: {
+        type: Number,
+        default: 0,
+    },
+    viewedBy: [
+        {
+            type: String,
+        }
+    ],
     createdAt: { type: Date, default: Date.now },
 });
 
