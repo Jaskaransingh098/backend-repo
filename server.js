@@ -40,6 +40,7 @@ io.on('connection', (socket) => {
     // Broadcast new message to relevant users
     socket.on('newMessage', (msg) => {
         io.emit(`message:${msg.recipient}`, msg);
+        io.emit(`message:${msg.sender}`, msg);
     });
     // Broadcast start of new conversation
     socket.on("startConversation", ({ sender, recipient }) => {
