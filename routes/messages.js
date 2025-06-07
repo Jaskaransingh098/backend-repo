@@ -24,7 +24,7 @@ router.get('/users', authenticateToken, async (req, res) => {
 });
 router.get('/all-users', authenticateToken, async (req, res) => {
     try {
-        const users = await User.find({}, 'username'); // only return username field
+        const users = await users.find({}, 'username'); // only return username field
         const usernames = users.map(u => u.username);
         res.json(usernames);
     } catch (err) {
