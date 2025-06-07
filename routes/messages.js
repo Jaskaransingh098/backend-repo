@@ -69,5 +69,26 @@ router.post('/messages', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Could not save message' });
     }
 });
+// ✅ Get list of users the current user has chatted with
+router.get('/conversations', authenticateToken, async (req, res) => {
+    const currentUsername = req.user.username;
+
+    try {
+        const messages = await Message.find({
+            $or: [{ sender: currentUsername }, { recipient: currentUsername }]
+        });
+
+        const userSet = new Set();
+        messages.forEach(msg => {
+            if (msg.sender !== currentUsername) userSet.add(msg.sender);
+            if (msg.recipient !== currentUsername) userSet.add(msg.recipient);
+        });
+
+        res.json([...userSet]); // Send as array
+    } catch (err) {
+        console.error('Error fetching conversations:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 module.exports = router;
