@@ -22,7 +22,16 @@ router.get('/users', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-
+router.get('/all-users', authenticateToken, async (req, res) => {
+    try {
+        const users = await User.find({}, 'username'); // only return username field
+        const usernames = users.map(u => u.username);
+        res.json(usernames);
+    } catch (err) {
+        console.error("Error fetching all users:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
 // ✅ Get messages between two users
 router.get('/messages/:sender/:recipient', authenticateToken, async (req, res) => {
     const { sender, recipient } = req.params;
