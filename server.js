@@ -42,6 +42,10 @@ io.on('connection', (socket) => {
         io.emit(`message:${msg.sender}:${msg.recipient}`, msg);
         io.emit(`message:${msg.recipient}:${msg.sender}`, msg);
     });
+    // Broadcast start of new conversation
+    socket.on("startConversation", ({ sender, recipient }) => {
+        io.emit("startConversation", { sender, recipient });
+    });
 
     socket.on('disconnect', () => {
         console.log('User disconnected');
