@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const authenticateToken = require('./path-to-authenticateToken'); // adjust path
+const authenticateToken = require('../middleware/authenticateToken'); // adjust path
 
 let messages = [
     { sender: 'User1', recipient: 'User2', message: 'Hello!', timestamp: new Date() },
