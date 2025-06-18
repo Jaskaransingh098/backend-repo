@@ -107,7 +107,7 @@ router.get("/trending", async (req, res) => {
             {
                 $project: {
                     _id: 1,
-                    topic: 1,
+                    industry: 1,
                     username: 1,
                     description: 1,
                     commentsCount: 1,
