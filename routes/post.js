@@ -254,8 +254,8 @@ router.get("/trending", async (req, res) => {
                     score: {
                         $add: [
                             { $multiply: ["$views", 1] },
-                            { $multiply: [{ $size: "$likes" }, 2] },
-                            { $multiply: [{ $size: "$comments" }, 3] }
+                            { $multiply: [{ $size: { $ifNull: ["$likes", []] } }, 2] },
+                            { $multiply: [{ $size: { $ifNull: ["$comments", []] } }, 3] }
                         ]
                     }
                 }
