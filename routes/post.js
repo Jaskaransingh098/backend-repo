@@ -104,21 +104,65 @@ router.get("/trending", async (req, res) => {
             },
             { $sort: { score: -1 } },
             { $limit: 9 },
+            {
+                $project: {
+                    _id: 1,
+                    topic: 1,
+                    username: 1,
+                    description: 1,
+                    commentsCount: 1,
+                    likesCount: 1,
+                    views: 1,
+                    comments: 1,
+                },
+            },
         ]);
 
-        const safePosts = posts.map((post, i) => ({
-            ...post,
-            image:
-                post.image ||
-                `https://source.unsplash.com/random/300x200?sig=${i + 1}&innovation`,
-        }));
-
-        res.status(200).json({ posts: safePosts });
+        res.status(200).json({ posts });
     } catch (err) {
         console.error("🔥 Error in /trending:", err);
         res.status(500).json({ msg: "Trending route crashed", error: err.message });
     }
 });
+
+
+// router.get("/trending", async (req, res) => {
+//     try {
+//         const posts = await idea.aggregate([
+//             {
+//                 $addFields: {
+//                     likesCount: { $size: { $ifNull: ["$likes", []] } },
+//                     commentsCount: { $size: { $ifNull: ["$comments", []] } },
+//                 },
+//             },
+//             {
+//                 $addFields: {
+//                     score: {
+//                         $add: [
+//                             { $multiply: ["$views", 1] },
+//                             { $multiply: ["$likesCount", 2] },
+//                             { $multiply: ["$commentsCount", 3] },
+//                         ],
+//                     },
+//                 },
+//             },
+//             { $sort: { score: -1 } },
+//             { $limit: 9 },
+//         ]);
+
+//         const safePosts = posts.map((post, i) => ({
+//             ...post,
+//             image:
+//                 post.image ||
+//                 `https://source.unsplash.com/random/300x200?sig=${i + 1}&innovation`,
+//         }));
+
+//         res.status(200).json({ posts: safePosts });
+//     } catch (err) {
+//         console.error("🔥 Error in /trending:", err);
+//         res.status(500).json({ msg: "Trending route crashed", error: err.message });
+//     }
+// });
 
 router.get('/:id', async (req, res) => {
     try {
@@ -283,46 +327,5 @@ router.get("/views", async (req, res) => {
         res.status(500).json({ message: "Error fetching views" });
     }
 });
-
-// router.get("/trending", async (req, res) => {
-//     try {
-//         const posts = await idea.aggregate([
-//             {
-//                 $addFields: {
-//                     likesCount: { $size: { $ifNull: ["$likes", []] } },
-//                     commentsCount: { $size: { $ifNull: ["$comments", []] } },
-//                     safeViews: { $ifNull: ["$views", 0] }, // ensure views is always a number
-//                 },
-//             },
-//             {
-//                 $addFields: {
-//                     score: {
-//                         $add: [
-//                             { $multiply: ["$safeViews", 1] },
-//                             { $multiply: ["$likesCount", 2] },
-//                             { $multiply: ["$commentsCount", 3] },
-//                         ],
-//                     },
-//                 },
-//             },
-//             { $sort: { score: -1 } },
-//             { $limit: 9 },
-//         ]);
-
-//         // Fallback image logic
-//         const safePosts = posts.map((post, i) => ({
-//             ...post,
-//             image:
-//                 post.image ||
-//                 `https://source.unsplash.com/random/300x200?sig=${i + 1}&innovation`,
-//         }));
-
-//         res.status(200).json({ posts: safePosts });
-//     } catch (err) {
-//         console.error("🔥 Error in /trending:", err);
-//         res.status(500).json({ msg: "Trending route crashed", error: err.message });
-//     }
-// });
-
 
 module.exports = router;
