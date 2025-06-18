@@ -245,29 +245,46 @@ router.get("/views", async (req, res) => {
     }
 });
 
-
 router.get("/trending", async (req, res) => {
     try {
         const posts = await idea.aggregate([
             {
                 $addFields: {
+                    likesCount: { $size: { $ifNull: ["$likes", []] } },
+                    commentsCount: { $size: { $ifNull: ["$comments", []] } },
+                },
+            },
+            {
+                $addFields: {
                     score: {
                         $add: [
                             { $multiply: ["$views", 1] },
-                            { $multiply: [{ $size: { $ifNull: ["$likes", []] } }, 2] },
-                            { $multiply: [{ $size: { $ifNull: ["$comments", []] } }, 3] }
-                        ]
-                    }
-                }
+                            { $multiply: ["$likesCount", 2] },
+                            { $multiply: ["$commentsCount", 3] },
+                        ],
+                    },
+                },
             },
             { $sort: { score: -1 } },
-            { $limit: 9 }
+            { $limit: 9 },
         ]);
 
-        res.status(200).json({ posts });
+        // Add fallback image if missing
+        const safePosts = posts.map((post) => ({
+            ...post,
+            image:
+                post.image ||
+                `https://source.unsplash.com/random/300x200?sig=${Math.floor(
+                    Math.random() * 1000
+                )}&innovation`,
+        }));
+
+        res.status(200).json({ posts: safePosts });
     } catch (error) {
-        console.error("Error fetching trending posts:", error);
+        console.error("❌ Error in /trending:", error.message);
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
+
+
 module.exports = router;
