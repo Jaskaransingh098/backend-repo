@@ -252,13 +252,14 @@ router.get("/trending", async (req, res) => {
                 $addFields: {
                     likesCount: { $size: { $ifNull: ["$likes", []] } },
                     commentsCount: { $size: { $ifNull: ["$comments", []] } },
+                    safeViews: { $ifNull: ["$views", 0] }, // ensure views is always a number
                 },
             },
             {
                 $addFields: {
                     score: {
                         $add: [
-                            { $multiply: ["$views", 1] },
+                            { $multiply: ["$safeViews", 1] },
                             { $multiply: ["$likesCount", 2] },
                             { $multiply: ["$commentsCount", 3] },
                         ],
@@ -269,7 +270,7 @@ router.get("/trending", async (req, res) => {
             { $limit: 9 },
         ]);
 
-        // Fallback for missing `image`
+        // Fallback image logic
         const safePosts = posts.map((post, i) => ({
             ...post,
             image:
