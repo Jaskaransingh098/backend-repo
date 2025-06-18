@@ -107,13 +107,23 @@ router.get("/trending", async (req, res) => {
             {
                 $project: {
                     _id: 1,
-                    industry: 1,
-                    username: 1,
+                    topic: 1,
                     description: 1,
-                    commentsCount: 1,
-                    likesCount: 1,
-                    views: 1,
+                    stage: 1,
+                    market: 1,
+                    goals: 1,
+                    fullName: 1,
+                    email: 1,
+                    role: 1,
+                    startupName: 1,
+                    industry: 1,
+                    website: 1,
+                    username: 1,
                     comments: 1,
+                    likes: 1,
+                    views: 1,
+                    likesCount: 1,
+                    commentsCount: 1
                 },
             },
         ]);
