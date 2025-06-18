@@ -269,20 +269,18 @@ router.get("/trending", async (req, res) => {
             { $limit: 9 },
         ]);
 
-        // Add fallback image if missing
-        const safePosts = posts.map((post) => ({
+        // Fallback for missing `image`
+        const safePosts = posts.map((post, i) => ({
             ...post,
             image:
                 post.image ||
-                `https://source.unsplash.com/random/300x200?sig=${Math.floor(
-                    Math.random() * 1000
-                )}&innovation`,
+                `https://source.unsplash.com/random/300x200?sig=${i + 1}&innovation`,
         }));
 
         res.status(200).json({ posts: safePosts });
-    } catch (error) {
-        console.error("❌ Error in /trending:", error.message);
-        res.status(500).json({ msg: "Server error", error: error.message });
+    } catch (err) {
+        console.error("🔥 Error in /trending:", err);
+        res.status(500).json({ msg: "Trending route crashed", error: err.message });
     }
 });
 
