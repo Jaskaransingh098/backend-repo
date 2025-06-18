@@ -244,4 +244,30 @@ router.get("/views", async (req, res) => {
         res.status(500).json({ message: "Error fetching views" });
     }
 });
+
+
+router.get("/trending", async (req, res) => {
+    try {
+        const posts = await idea.aggregate([
+            {
+                $addFields: {
+                    score: {
+                        $add: [
+                            { $multiply: ["$views", 1] },
+                            { $multiply: [{ $size: "$likes" }, 2] },
+                            { $multiply: [{ $size: "$comments" }, 3] }
+                        ]
+                    }
+                }
+            },
+            { $sort: { score: -1 } },
+            { $limit: 9 }
+        ]);
+
+        res.status(200).json({ posts });
+    } catch (error) {
+        console.error("Error fetching trending posts:", error);
+        res.status(500).json({ msg: "Server error", error: error.message });
+    }
+});
 module.exports = router;
