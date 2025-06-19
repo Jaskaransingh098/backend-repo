@@ -135,44 +135,27 @@ router.get("/trending", async (req, res) => {
     }
 });
 
-
-// router.get("/trending", async (req, res) => {
-//     try {
-//         const posts = await idea.aggregate([
-//             {
-//                 $addFields: {
-//                     likesCount: { $size: { $ifNull: ["$likes", []] } },
-//                     commentsCount: { $size: { $ifNull: ["$comments", []] } },
-//                 },
-//             },
-//             {
-//                 $addFields: {
-//                     score: {
-//                         $add: [
-//                             { $multiply: ["$views", 1] },
-//                             { $multiply: ["$likesCount", 2] },
-//                             { $multiply: ["$commentsCount", 3] },
-//                         ],
-//                     },
-//                 },
-//             },
-//             { $sort: { score: -1 } },
-//             { $limit: 9 },
-//         ]);
-
-//         const safePosts = posts.map((post, i) => ({
-//             ...post,
-//             image:
-//                 post.image ||
-//                 `https://source.unsplash.com/random/300x200?sig=${i + 1}&innovation`,
-//         }));
-
-//         res.status(200).json({ posts: safePosts });
-//     } catch (err) {
-//         console.error("🔥 Error in /trending:", err);
-//         res.status(500).json({ msg: "Trending route crashed", error: err.message });
-//     }
-// });
+router.get("/random", async (req, res) => {
+    try {
+        const randomPosts = await idea.aggregate([
+            { $sample: { size: 10 } },
+            {
+                $project: {
+                    _id: 1,
+                    topic: 1,
+                    description: 1,
+                    username: 1,
+                    likes: 1,
+                    comments: 1,
+                },
+            },
+        ]);
+        res.status(200).json({ posts: randomPosts });
+    } catch (err) {
+        console.error("Error fetching random posts:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 router.get('/:id', async (req, res) => {
     try {
