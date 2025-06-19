@@ -136,9 +136,19 @@ router.get("/trending", async (req, res) => {
 });
 
 router.get("/random", async (req, res) => {
+
+    const { industry } = req.query;
+
     try {
+
+        const matchStage = industry
+            ? { $match: { industry: { $regex: new RegExp(`^${industry}$`, "i") } } }
+            : { $match: {} };
+
+
+
         const randomPosts = await idea.aggregate([
-            { $sample: { size: 10 } },
+            { $sample: { size: 5 } },
             {
                 $project: {
                     _id: 1,
