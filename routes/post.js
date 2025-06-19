@@ -135,37 +135,6 @@ router.get("/trending", async (req, res) => {
     }
 });
 
-// router.get("/random", async (req, res) => {
-
-//     const { industry } = req.query;
-
-//     try {
-
-//         const matchStage = industry
-//             ? { $match: { industry: { $regex: new RegExp(`^${industry}$`, "i") } } }
-//             : { $match: {} };
-
-
-
-//         const randomPosts = await idea.aggregate([
-//             { $sample: { size: 5 } },
-//             {
-//                 $project: {
-//                     _id: 1,
-//                     topic: 1,
-//                     description: 1,
-//                     username: 1,
-//                     likes: 1,
-//                     comments: 1,
-//                 },
-//             },
-//         ]);
-//         res.status(200).json({ posts: randomPosts });
-//     } catch (err) {
-//         console.error("Error fetching random posts:", err);
-//         res.status(500).json({ message: "Internal server error" });
-//     }
-// });
 router.get("/random", async (req, res) => {
     const { industry } = req.query;
 
