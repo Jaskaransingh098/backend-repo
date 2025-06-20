@@ -157,6 +157,11 @@ router.get("/random", async (req, res) => {
                     username: 1,
                     likes: 1,
                     comments: 1,
+                    website: 1,
+                    createdAt: 1,
+                    stage: 1,
+                    market: 1,
+                    goals: 1
                 },
             }
         );
