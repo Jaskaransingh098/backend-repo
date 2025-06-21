@@ -174,7 +174,7 @@ router.get("/random", async (req, res) => {
     }
 });
 
-router.get("/allposts", authMiddleware, async (req, res) => {
+router.get("/allposts", authenticateToken, async (req, res) => {
     try {
         const ideas = await idea.find().sort({ createdAt: -1 }); // newest first
         res.status(200).json({ ideas });
