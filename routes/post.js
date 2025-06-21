@@ -174,6 +174,15 @@ router.get("/random", async (req, res) => {
     }
 });
 
+router.get("/allposts", authMiddleware, async (req, res) => {
+    try {
+        const ideas = await idea.find().sort({ createdAt: -1 }); // newest first
+        res.status(200).json({ ideas });
+    } catch (error) {
+        console.error("Error fetching all posts:", error);
+        res.status(500).json({ error: "Failed to fetch all posts" });
+    }
+});
 router.get('/:id', async (req, res) => {
     try {
         const idea = await idea.findById(req.params.id);
