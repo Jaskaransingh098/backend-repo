@@ -173,7 +173,7 @@ router.get("/random", async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
-router.get("/allposts", authenticateToken, async (req, res) => {
+router.get("/allposts", async (req, res) => {
     try {
         const ideas = await idea.find()
             .sort({ createdAt: -1 }) // Newest first
