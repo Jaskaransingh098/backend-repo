@@ -38,15 +38,7 @@ router.post('/', authenticateToken, async (req, res) => {
     res.status(201).json({ msg: 'idea submitted successfully!', idea: newidea });
 });
 
-// ✅ Get all ideas
-// router.get('/', async (req, res) => {
-//     try {
-//         const ideas = await idea.find();
-//         res.status(200).json({ ideas });
-//     } catch (error) {
-//         res.status(500).json({ msg: 'Server error', error: error.message });
-//     }
-// });
+
 
 // ✅ Edit post
 router.put('/:id', authenticateToken, async (req, res) => {
@@ -216,16 +208,6 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
 });
 
 
-// router.get('/:id', async (req, res) => {
-//     try {
-//         const idea = await idea.findById(req.params.id);
-//         if (!idea) return res.status(404).json({ message: "Post not found" });
-//         res.status(200).json(idea);
-//     } catch (error) {
-//         res.status(500).json({ message: "Error fetching post", error });
-//     }
-// });
-
 // ✅ Delete post
 router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
@@ -332,101 +314,6 @@ router.get('/:id/comments', async (req, res) => {
     }
 });
 
-// ✅ Add comment to post
-// router.post('/:id/comments', authenticateToken, async (req, res) => {
-//     try {
-//         const post = await idea.findById(req.params.id);
-//         const newComment = {
-//             username: req.user.username,
-//             text: req.body.text,
-//         };
-
-//         post.comments.push(newComment);
-//         await post.save();
-
-//         res.status(201).json(newComment);
-//     } catch (err) {
-//         console.error("Error adding comment:", err);
-//         res.status(500).json({ message: "Internal server error" });
-//     }
-// });
-// router.post('/:id/like', authenticateToken, async (req, res) => {
-//     try {
-//         const post = await idea.findById(req.params.id);
-//         const user = req.user.username; // or user._id
-
-//         const index = post.likes.indexOf(user);
-//         if (index === -1) {
-//             post.likes.push(user); // Like
-//         } else {
-//             post.likes.splice(index, 1); // Unlike
-//         }
-
-//         await post.save();
-//         res.json({ likes: post.likes });
-//     } catch (err) {
-//         console.error("Error toggling like:", err);
-//         res.status(500).json({ message: "Internal server error" });
-//     }
-// });
-// router.get('/:id/liked', authenticateToken, async (req, res) => {
-//     const { id } = req.params;
-//     const user = req.user;
-
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//         return res.status(400).json({ msg: 'Invalid post ID' });
-//     }
-
-//     try {
-//         const foundidea = await idea.findById(id);
-//         if (!foundidea) {
-//             return res.status(404).json({ msg: 'Post not found' });
-//         }
-
-//         const liked = foundidea.likes.includes(user.username);
-//         res.status(200).json({ liked });
-//     } catch (error) {
-//         console.error('Error checking like status:', error);
-//         res.status(500).json({ msg: 'Internal Server Error' });
-//     }
-// });
-// router.get('/:id/comments', async (req, res) => {
-//     const { id } = req.params;
-
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//         return res.status(400).json({ msg: 'Invalid post ID' });
-//     }
-
-//     try {
-//         const foundidea = await idea.findById(id);
-//         if (!foundidea) {
-//             return res.status(404).json({ msg: 'Post not found' });
-//         }
-
-//         res.status(200).json({ comments: foundidea.comments });
-//     } catch (error) {
-//         console.error('Error fetching comments:', error);
-//         res.status(500).json({ msg: 'Internal Server Error' });
-//     }
-// });
-// router.delete('/:id/comments', authenticateToken, async (req, res) => {
-//     try {
-//         const { text } = req.body;
-//         const post = await idea.findById(req.params.id);
-//         if (!post) return res.status(404).json({ error: 'Post not found' });
-
-//         // Only delete your own comment
-//         const user = req.user.username;
-//         post.comments = post.comments.filter(
-//             (c) => !(c.username === user && c.text === text)
-//         );
-
-//         await post.save();
-//         res.status(200).json({ message: 'Comment deleted' });
-//     } catch (err) {
-//         res.status(500).json({ error: 'Error deleting comment' });
-//     }
-// });
 router.post("/:id/view", authenticateToken, async (req, res) => {
     const { username } = req.user;
 
@@ -434,10 +321,7 @@ router.post("/:id/view", authenticateToken, async (req, res) => {
         const post = await idea.findById(req.params.id);
         if (!post) return res.status(404).json({ message: "Post not found" });
 
-        // Optionally skip counting views for the post owner
-        // if (post.username === username) {
-        //     return res.status(200).json({ views: post.views });
-        // }
+        
 
         if (!post.viewedBy.includes(username)) {
             post.views += 1;
@@ -470,13 +354,5 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// router.get("/views", async (req, res) => {
-//     try {
-//         const posts = await idea.find({}, "topic views"); // send title + views only
-//         res.json(posts);
-//     } catch (err) {
-//         res.status(500).json({ message: "Error fetching views" });
-//     }
-// });
 
 module.exports = router;
