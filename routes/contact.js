@@ -3,6 +3,7 @@ const router = express.Router();
 const nodemailer = require("nodemailer")
 
 router.post("/", async (req, res) => {
+    console.log("📝 Contact form payload:", req.body);
     const { fullName, email, phone, message } = req.body;
 
     try {
