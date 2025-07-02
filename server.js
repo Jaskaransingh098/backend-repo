@@ -8,6 +8,7 @@ const messageRoute = require('./routes/messages')
 const paymentRoutes = require('./routes/payment')
 const authRoutes = require("./routes/auth");
 const postRoutes = require("./routes/post");
+const ContactRoute = require("./routes/contact");
 
 
 
@@ -33,6 +34,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use('/api', messageRoute)
 app.use('/api', paymentRoutes);
+app.use("/api/contact", ContactRoute);
 
 io.on('connection', (socket) => {
     console.log('A user connected');
