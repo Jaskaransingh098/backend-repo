@@ -15,8 +15,9 @@ router.post("/", async (req, res) => {
         });
 
         const mailOptions = {
-            from: email,
+            from: `"InnoLinkk Contact Form" <${process.env.MAIL_USER}>`,
             to: process.env.MAIL_USER,
+            replyTo: email,
             subject: "New Contact Form Submission",
             html: `
                 <h3>Contact Form Submission</h3>
@@ -28,10 +29,10 @@ router.post("/", async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).json({success: true, message: "Email sent successfully"});
-    } catch(err){
+        res.status(200).json({ success: true, message: "Email sent successfully" });
+    } catch (err) {
         console.log("Email sending error:", err);
-        res.status(500).json({success: false, message:" Email failed to send"})
+        res.status(500).json({ success: false, message: " Email failed to send" })
     }
 });
 
