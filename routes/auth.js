@@ -109,9 +109,12 @@ router.post('/verify-otp', (req, res) => {
 
     if (!storedOtp) return res.status(400).json({ msg: 'No OTP found. Try again.' });
     if (storedOtp !== otp) return res.status(400).json({ msg: 'Invalid OTP' });
+    if (String(storedOtp) !== String(otp)) {
+        return res.status(400).json({ msg: 'Invalid OTP' });
+    }
 
     otpStore.delete(email); // remove after verification
-    res.json({ msg: 'OTP verified' });
+    res.json({ verified: true });  // ✅ FIXED RESPONSE
 });
 
 router.post('/login', async (req, res) => {
