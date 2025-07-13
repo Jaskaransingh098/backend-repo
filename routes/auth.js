@@ -133,14 +133,19 @@ router.post('/google-signup', async (req, res) => {
         // 2. Check if user already exists
         let user = await User.findOne({ email });
 
-        if (user) {
-            // Existing user → login
-            const token = jwt.sign(
-                { id: user._id, username: user.username, isPro: user.isPro },
-                JWT_SECRET,
-                { expiresIn: "7d" }
-            );
-            return res.json({ token });
+        if (!username) {
+            if (user) {
+                // ✅ Email registered → login flow
+                const token = jwt.sign(
+                    { id: user._id, username: user.username, isPro: user.isPro },
+                    JWT_SECRET,
+                    { expiresIn: "7d" }
+                );
+                return res.json({ token });
+            } else {
+                // ❌ Not registered
+                return res.status(401).json({ msg: "Email not registered" });
+            }
         }
 
         // 3. If new user, validate username
