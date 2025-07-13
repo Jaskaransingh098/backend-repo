@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
+const { OAuth2Client } = require("google-auth-library")
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const nodemailer = require('nodemailer');
 const otpGenerator = require("otp-generator");
 const authenticateToken = require('../middleware/authenticateToken')
@@ -116,6 +118,64 @@ router.post('/verify-otp', (req, res) => {
     otpStore.delete(email); // remove after verification
     res.json({ verified: true });  // ✅ FIXED RESPONSE
 });
+router.post('/google-signup', async (req, res) => {
+    const { credential, username } = req.body;
+
+    try {
+        // 1. Verify Google ID token
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const email = payload.email;
+
+        // 2. Check if user already exists
+        let user = await User.findOne({ email });
+
+        if (user) {
+            // Existing user → login
+            const token = jwt.sign(
+                { id: user._id, username: user.username, isPro: user.isPro },
+                JWT_SECRET,
+                { expiresIn: "7d" }
+            );
+            return res.json({ token });
+        }
+
+        // 3. If new user, validate username
+        if (!username) {
+            return res.status(400).json({ msg: "Username is required" });
+        }
+
+        const usernameExists = await User.findOne({ username });
+        if (usernameExists) {
+            return res.status(400).json({ msg: "Username already taken" });
+        }
+
+        // 4. Create new user
+        const newUser = new User({
+            username,
+            email,
+            password: "google-auth", // dummy placeholder
+            isPro: false,
+        });
+
+        await newUser.save();
+
+        const token = jwt.sign(
+            { id: newUser._id, username: newUser.username, isPro: newUser.isPro },
+            JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        res.json({ token });
+    } catch (err) {
+        console.error("Google Auth Error:", err);
+        res.status(401).json({ msg: "Invalid Google token" });
+    }
+});
+
 
 router.post('/login', async (req, res) => {
     const { username, password } =
