@@ -23,18 +23,26 @@ mongoose.connect(process.env.MONGO_URI, {
     console.error("❌ MongoDB connection error:", err.message);
 });
 
-cron.schedule("0 */4 * * *", async () => {
-    if (process.env.ENABLE_BOTS !== "true") {
-        console.log("🛑 Bot posting is disabled (.env)");
-        return;
-    }
+// cron.schedule("0 */4 * * *", async () => {
+//     if (process.env.ENABLE_BOTS !== "true") {
+//         console.log("🛑 Bot posting is disabled (.env)");
+//         return;
+//     }
 
+//     try {
+//         await postBotIdea();
+//     } catch (err) {
+//         console.error("❌ Error in bot posting:", err.message);
+//     }
+// });
+(async () => {
     try {
+        console.log("🚀 Running bot posting test manually...");
         await postBotIdea();
     } catch (err) {
         console.error("❌ Error in bot posting:", err.message);
     }
-});
+})();
 
 async function getRealUserInfo() {
     try {
@@ -98,7 +106,6 @@ async function postBotIdea() {
         console.log(`🆕 New bot registered: ${uniqueUsername}`);
 
 
-        console.log(`🆕 New bot registered: ${username}`);
     }
 
     const gptIdea = await generateIdeaFromGPT();
@@ -118,7 +125,9 @@ async function postBotIdea() {
         industry: "Technology",
     });
     await newIdea.save();
-    console.log(`✅ GPT idea posted by ${botUser.username}: ${gptIdea}`);
+    console.log(`✅ GPT idea posted by ${botUser.username}`);
+    console.log("🧠 Idea:", gptIdea);
+
 }
 
 async function generateIdeaFromGPT() {
