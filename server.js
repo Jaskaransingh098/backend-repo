@@ -66,9 +66,21 @@ mongoose.connect(process.env.MONGO_URI, {
 
 
 //start server
+
+app.get("/ping", (req, res) => {
+    res.send("pong");
+});
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () =>
     console.log(`Server running on port ${PORT}`))
+
+const axios = require("axios");
+setInterval(() => {
+    axios.get("https://backend-repo-f2m0.onrender.com/ping")
+        .then(() => console.log("🔁 Self-ping sent to keep backend alive"))
+        .catch((err) => console.error("❌ Self-ping failed:", err.message));
+}, 1000 * 60 * 14);
 
 
 require('./botPoster');
