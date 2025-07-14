@@ -50,9 +50,12 @@ async function getRealUserInfo() {
         const res = await axios.get("https://randomuser.me/api/");
         const user = res.data.results[0];
 
+        const username = `${user.name.first}${user.name.last}${Math.floor(Math.random() * 1000)}`.replace(/[^a-zA-Z0-9_]/g, "");
+        const email = user.email;
+
         return {
-            username: user.login.username.replace(/[^a-zA-Z0-9_]/g, ""),
-            email: user.email,
+            username,
+            email,
         };
     } catch (err) {
         console.error("⚠️ Using fallback username/email");
@@ -62,7 +65,6 @@ async function getRealUserInfo() {
         };
     }
 }
-
 
 async function postBotIdea() {
     const existingBots = await User.find({ isBot: true });
@@ -112,19 +114,6 @@ async function postBotIdea() {
     const gptIdea = await generateIdeaFromGPT();
     if (!gptIdea) return;
 
-    // const newIdea = new Idea({
-    //     username: botUser.username,
-    //     topic: "Startup",
-    //     description: gptIdea,
-    //     stage: "Idea",
-    //     market: "Global",
-    //     goals: "Exploring potential",
-    //     fullName: "Generated Bot",
-    //     email: botUser.email,
-    //     role: "Innovator",
-    //     startupName: "InnoBot Labs",
-    //     industry: "Technology",
-    // });
 
     const {
         topic,
