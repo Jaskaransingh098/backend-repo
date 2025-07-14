@@ -8,7 +8,8 @@ dotenv.config();
 const { OpenAI } = require("openai");
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.GROQ_API_KEY,          // 🔁 Replace with your Groq key in .env
+    baseURL: "https://api.groq.com/openai/v1", // ✅ This points to Groq’s endpoint
 });
 
 const User = require("./models/User");
@@ -133,7 +134,7 @@ async function postBotIdea() {
 async function generateIdeaFromGPT() {
     try {
         const res = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
+            model: "llama3-70b-8192",
             messages: [
                 {
                     role: "system",
@@ -167,9 +168,14 @@ Only return the pure JSON. No explanation, no markdown.`,
         });
 
         const content = res.choices[0].message.content.trim();
-        return JSON.parse(content);
+
+        // Safety fallback to remove markdown if returned
+        const cleaned = content.replace(/```json|```/g, "").trim();
+
+        return JSON.parse(cleaned);
     } catch (err) {
         console.error("❌ GPT idea generation failed:", err.message);
         return null;
     }
 }
+
