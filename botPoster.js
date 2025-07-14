@@ -112,19 +112,46 @@ async function postBotIdea() {
     const gptIdea = await generateIdeaFromGPT();
     if (!gptIdea) return;
 
+    // const newIdea = new Idea({
+    //     username: botUser.username,
+    //     topic: "Startup",
+    //     description: gptIdea,
+    //     stage: "Idea",
+    //     market: "Global",
+    //     goals: "Exploring potential",
+    //     fullName: "Generated Bot",
+    //     email: botUser.email,
+    //     role: "Innovator",
+    //     startupName: "InnoBot Labs",
+    //     industry: "Technology",
+    // });
+
+    const {
+        topic,
+        description,
+        stage,
+        market,
+        goals,
+        fullName,
+        role,
+        startupName,
+        industry
+    } = gptIdea;
+
     const newIdea = new Idea({
         username: botUser.username,
-        topic: "Startup",
-        description: gptIdea,
-        stage: "Idea",
-        market: "Global",
-        goals: "Exploring potential",
-        fullName: "Generated Bot",
+        topic,
+        description,
+        stage,
+        market,
+        goals,
+        fullName,
         email: botUser.email,
-        role: "Innovator",
-        startupName: "InnoBot Labs",
-        industry: "Technology",
+        role,
+        startupName,
+        industry,
     });
+
     await newIdea.save();
     console.log(`✅ GPT idea posted by ${botUser.username}`);
     console.log("🧠 Idea:", gptIdea);
