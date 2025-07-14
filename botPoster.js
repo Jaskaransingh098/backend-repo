@@ -44,19 +44,19 @@ mongoose.connect(process.env.MONGO_URI, {
         console.error("❌ Error in bot posting:", err.message);
     }
 })();
+
 async function getRealUserInfo() {
     try {
-        const res = await axios.get("https://randomuser.me/api/");
-        console.log("✅ randomuser.me response:", res.data);
-        const user = res.data.results[0];
+        const res = await axios.get("https://dummyjson.com/users/random");
+        const user = res.data;
 
-        const fullName = `${user.name.first} ${user.name.last}`;
-        const username = `${user.name.first}${user.name.last}${Math.floor(Math.random() * 1000)}`.toLowerCase();
-        const email = `${user.name.first}.${user.name.last}${Math.floor(Math.random() * 1000)}@example.com`.toLowerCase();
+        const fullName = `${user.firstName} ${user.lastName}`;
+        const username = `${user.firstName}${user.lastName}${Math.floor(Math.random() * 1000)}`.toLowerCase();
+        const email = `${user.firstName}.${user.lastName}${Math.floor(Math.random() * 1000)}@example.com`.toLowerCase();
 
         return { fullName, username, email };
     } catch (err) {
-        console.error("⚠️ Using fallback random name/email");
+        console.error("⚠️ Using fallback random name/email", err.message);
         const fallbackName = `BotUser${Math.floor(Math.random() * 1000)}`;
         return {
             fullName: fallbackName,
@@ -65,6 +65,7 @@ async function getRealUserInfo() {
         };
     }
 }
+
 
 
 // async function postBotIdea() {
