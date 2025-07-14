@@ -147,54 +147,6 @@ async function getRealUserInfo() {
 
 // }
 
-// async function generateIdeaFromGPT() {
-//     try {
-//         const res = await openai.chat.completions.create({
-//             model: "llama3-70b-8192",
-//             messages: [
-//                 {
-//                     role: "system",
-//                     content: "You are a creative assistant that generates startup ideas in structured JSON format for a platform. Each idea must match the allowed dropdown options used in a web form.",
-//                 },
-//                 {
-//                     role: "user",
-//                     content: `Generate a startup idea in JSON format with the following structure. Fields like "industry", "stage", and "goals" must randomly choose from these allowed options only:
-
-// industry: ["ecommerce", "health", "education", "tech", "food", "finance", "manufacturing", "fashion"]
-// stage: ["idea", "prototype", "launched"]
-// goals: ["short", "long", "social"]
-
-// Format:
-// {
-//   "topic": "string",
-//   "description": "string (short idea summary)",
-//   "stage": "one of allowed values",
-//   "market": "e.g., Global, India, B2B, etc.",
-//   "goals": "one of allowed values",
-//   "fullName": "realistic name",
-//   "role": "Founder or Innovator",
-//   "startupName": "realistic name",
-//   "industry": "one of allowed values"
-// }
-
-// Only return the pure JSON. No explanation, no markdown.`,
-//                 },
-//             ],
-//             temperature: 0.9,
-//         });
-
-//         const content = res.choices[0].message.content.trim();
-
-//         // Safety fallback to remove markdown if returned
-//         const cleaned = content.replace(/```json|```/g, "").trim();
-
-//         return JSON.parse(cleaned);
-//     } catch (err) {
-//         console.error("❌ GPT idea generation failed:", err.message);
-//         return null;
-//     }
-// }
-
 async function postBotIdea() {
     const existingBots = await User.find({ isBot: true });
 
@@ -266,3 +218,52 @@ async function postBotIdea() {
     console.log("🧠 Idea:", gptIdea);
 }
 
+
+
+async function generateIdeaFromGPT() {
+    try {
+        const res = await openai.chat.completions.create({
+            model: "llama3-70b-8192",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a creative assistant that generates startup ideas in structured JSON format for a platform. Each idea must match the allowed dropdown options used in a web form.",
+                },
+                {
+                    role: "user",
+                    content: `Generate a startup idea in JSON format with the following structure. Fields like "industry", "stage", and "goals" must randomly choose from these allowed options only:
+
+industry: ["ecommerce", "health", "education", "tech", "food", "finance", "manufacturing", "fashion"]
+stage: ["idea", "prototype", "launched"]
+goals: ["short", "long", "social"]
+
+Format:
+{
+  "topic": "string",
+  "description": "string (short idea summary)",
+  "stage": "one of allowed values",
+  "market": "e.g., Global, India, B2B, etc.",
+  "goals": "one of allowed values",
+  "fullName": "realistic name",
+  "role": "Founder or Innovator",
+  "startupName": "realistic name",
+  "industry": "one of allowed values"
+}
+
+Only return the pure JSON. No explanation, no markdown.`,
+                },
+            ],
+            temperature: 0.9,
+        });
+
+        const content = res.choices[0].message.content.trim();
+
+        // Safety fallback to remove markdown if returned
+        const cleaned = content.replace(/```json|```/g, "").trim();
+
+        return JSON.parse(cleaned);
+    } catch (err) {
+        console.error("❌ GPT idea generation failed:", err.message);
+        return null;
+    }
+}
