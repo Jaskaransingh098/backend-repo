@@ -47,46 +47,26 @@ mongoose.connect(process.env.MONGO_URI, {
 
 async function getRealUserInfo() {
     try {
-        const res = await axios.get("https://random-data-api.com/api/users/random_user");
-        const user = res.data;
+        const res = await axios.get("https://fakerapi.it/api/v1/persons?_quantity=1");
+        const person = res.data.data[0];
 
-        const fullName = `${user.first_name} ${user.last_name}`;
-        const username = `${user.first_name}${user.last_name}${Math.floor(Math.random() * 1000)}`.toLowerCase();
-        const email = `${user.first_name}.${user.last_name}${Math.floor(Math.random() * 1000)}@example.com`.toLowerCase();
+        const fullName = `${person.firstname} ${person.lastname}`;
+        const username = `${person.firstname}${person.lastname}${Math.floor(Math.random() * 1000)}`.toLowerCase();
+        const email = person.email.toLowerCase();
 
-        console.log("✅ Random user fetched:", fullName, username, email);
-
-        return {
-            fullName,
-            username,
-            email
-        };
+        console.log("✅ Fetched user from FakerAPI:", fullName, username, email);
+        return { fullName, username, email };
     } catch (err) {
-        console.error("❌ Failed to fetch random user:", err.message);
-
-        if (err.response) {
-            console.error("❌ API response error:", err.response.status, err.response.data);
-        } else if (err.request) {
-            console.error("❌ No response received. Check network or Render firewall.");
-        } else {
-            console.error("❌ Unknown error:", err);
-        }
-
-        // Fallback in case API fails
-        const fallbackName = `BotUser${Math.floor(Math.random() * 1000)}`;
-        const fallbackUsername = `bot${Math.floor(Math.random() * 100000)}`;
-        const fallbackEmail = `bot${Math.floor(Math.random() * 100000)}@example.com`;
-
-        console.log("⚠️ Using fallback user:", fallbackName, fallbackUsername, fallbackEmail);
-
+        console.error("❌ Failed to fetch user from FakerAPI:", err.message);
+        console.error("⚠️ Using fallback user");
+        const fallback = Math.floor(Math.random() * 100000);
         return {
-            fullName: fallbackName,
-            username: fallbackUsername,
-            email: fallbackEmail
+            fullName: `BotUser${fallback}`,
+            username: `bot${fallback}`,
+            email: `bot${fallback}@example.com`,
         };
     }
 }
-
 
 
 
