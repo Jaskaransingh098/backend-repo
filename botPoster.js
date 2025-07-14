@@ -70,87 +70,6 @@ async function getRealUserInfo() {
 
 
 
-// async function postBotIdea() {
-//     const existingBots = await User.find({ isBot: true });
-
-//     const useExisting = existingBots.length > 0 && Math.random() < 0.5;
-//     let botUser;
-
-//     if (useExisting) {
-//         botUser = existingBots[Math.floor(Math.random() * existingBots.length)];
-//     } else {
-//         let uniqueUsername = "", uniqueEmail = "";
-//         let tries = 0;
-
-//         do {
-//             const { username, email } = await getRealUserInfo();
-//             const existing = await User.findOne({ $or: [{ username }, { email }] });
-
-//             if (!existing) {
-//                 uniqueUsername = username;
-//                 uniqueEmail = email;
-//                 break;
-//             }
-
-//             tries++;
-//         } while (tries < 5); // Retry up to 5 times
-
-//         if (!uniqueUsername || !uniqueEmail) {
-//             console.error("❌ Failed to generate unique bot username/email after 5 tries.");
-//             return;
-//         }
-
-//         const hashedPassword = await bcrypt.hash("botsecure123", 10);
-
-//         botUser = await User.create({
-//             username: uniqueUsername,
-//             email: uniqueEmail,
-//             password: hashedPassword,
-//             isBot: true,
-//             isVerified: true,
-//         });
-
-//         console.log(`🆕 New bot registered: ${uniqueUsername}`);
-
-
-//     }
-
-//     const gptIdea = await generateIdeaFromGPT();
-//     if (!gptIdea) return;
-
-
-//     const {
-//         topic,
-//         description,
-//         stage,
-//         market,
-//         goals,
-//         fullName,
-//         role,
-//         startupName,
-//         industry
-//     } = gptIdea;
-
-//     const newIdea = new Idea({
-//         username: botUser.username,
-//         topic,
-//         description,
-//         stage,
-//         market,
-//         goals,
-//         fullName,
-//         email: botUser.email,
-//         role,
-//         startupName,
-//         industry,
-//     });
-
-//     await newIdea.save();
-//     console.log(`✅ GPT idea posted by ${botUser.username}`);
-//     console.log("🧠 Idea:", gptIdea);
-
-// }
-
 async function postBotIdea() {
     const existingBots = await User.find({ isBot: true });
 
@@ -160,7 +79,7 @@ async function postBotIdea() {
 
     if (useExisting) {
         botUser = existingBots[Math.floor(Math.random() * existingBots.length)];
-        fullName = "Generated Bot"; // fallback name for existing bot
+        fullName = "Generated Bot"; 
     } else {
         let tries = 0;
         let uniqueUsername = "", uniqueEmail = "";
@@ -202,19 +121,26 @@ async function postBotIdea() {
 
     const gptIdea = await generateIdeaFromGPT();
     if (!gptIdea) return;
+    const industries = ["ecommerce", "health", "education", "tech", "food", "finance", "manufacturing", "fashion"];
+    const stages = ["idea", "prototype", "launched"];
+    const goalsList = ["short", "long", "social"];
+
+    const randomIndustry = industries[Math.floor(Math.random() * industries.length)];
+    const randomStage = stages[Math.floor(Math.random() * stages.length)];
+    const randomGoals = goalsList[Math.floor(Math.random() * goalsList.length)];
 
     const newIdea = new Idea({
         username: botUser.username,
         topic: gptIdea.topic,
         description: gptIdea.description,
-        stage: gptIdea.stage,
+        stage: randomStage,       
         market: gptIdea.market,
-        goals: gptIdea.goals,
+        goals: randomGoals,      
         fullName: fullName,
         email: botUser.email,
         role: gptIdea.role,
         startupName: gptIdea.startupName,
-        industry: gptIdea.industry,
+        industry: randomIndustry, 
     });
 
     await newIdea.save();
