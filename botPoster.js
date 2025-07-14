@@ -24,41 +24,68 @@ mongoose.connect(process.env.MONGO_URI, {
     console.error("❌ MongoDB connection error:", err.message);
 });
 
-// cron.schedule("0 */4 * * *", async () => {
-//     if (process.env.ENABLE_BOTS !== "true") {
-//         console.log("🛑 Bot posting is disabled (.env)");
-//         return;
-//     }
+cron.schedule("0 */4 * * *", async () => {
+    if (process.env.ENABLE_BOTS !== "true") {
+        console.log("🛑 Bot posting is disabled (.env)");
+        return;
+    }
 
-//     try {
-//         await postBotIdea();
-//     } catch (err) {
-//         console.error("❌ Error in bot posting:", err.message);
-//     }
-// });
-(async () => {
     try {
-        console.log("🚀 Running bot posting test manually...");
         await postBotIdea();
     } catch (err) {
         console.error("❌ Error in bot posting:", err.message);
     }
-})();
+});
+// (async () => {
+//     try {
+//         console.log("🚀 Running bot posting test manually...");
+//         await postBotIdea();
+//     } catch (err) {
+//         console.error("❌ Error in bot posting:", err.message);
+//     }
+// })();
+
+// async function getRealUserInfo() {
+//     try {
+//         const res = await axios.get("https://fakerapi.it/api/v1/persons?_quantity=1");
+//         const person = res.data.data[0];
+
+//         const fullName = `${person.firstname} ${person.lastname}`;
+//         const username = `${person.firstname}${person.lastname}${Math.floor(Math.random() * 1000)}`.toLowerCase();
+//         const email = person.email.toLowerCase();
+
+//         console.log("✅ Fetched user from FakerAPI:", fullName, username, email);
+//         return { fullName, username, email };
+//     } catch (err) {
+//         console.error("❌ Failed to fetch user from FakerAPI:", err.message);
+//         console.error("⚠️ Using fallback user");
+//         const fallback = Math.floor(Math.random() * 100000);
+//         return {
+//             fullName: `BotUser${fallback}`,
+//             username: `bot${fallback}`,
+//             email: `bot${fallback}@example.com`,
+//         };
+//     }
+// }
 
 async function getRealUserInfo() {
     try {
         const res = await axios.get("https://fakerapi.it/api/v1/persons?_quantity=1");
         const person = res.data.data[0];
 
-        const fullName = `${person.firstname} ${person.lastname}`;
-        const username = `${person.firstname}${person.lastname}${Math.floor(Math.random() * 1000)}`.toLowerCase();
-        const email = person.email.toLowerCase();
+        const first = person.firstname;
+        const last = person.lastname;
+        const fullName = `${first} ${last}`;
+        const randomNum = Math.floor(Math.random() * 10000);
 
-        console.log("✅ Fetched user from FakerAPI:", fullName, username, email);
+        const username = `${first}${last}${randomNum}`.toLowerCase();
+        const email = `${first}.${last}${randomNum}@example.com`.toLowerCase();
+
+        console.log("✅ Fetched user:", fullName, username, email);
+
         return { fullName, username, email };
     } catch (err) {
-        console.error("❌ Failed to fetch user from FakerAPI:", err.message);
-        console.error("⚠️ Using fallback user");
+        console.error("❌ Failed to fetch user from API:", err.message);
         const fallback = Math.floor(Math.random() * 100000);
         return {
             fullName: `BotUser${fallback}`,
@@ -70,19 +97,19 @@ async function getRealUserInfo() {
 
 
 
+
 async function postBotIdea() {
     const existingBots = await User.find({ isBot: true });
 
     const useExisting = existingBots.length > 0 && Math.random() < 0.5;
     let botUser;
-    let fullName;
 
     if (useExisting) {
         botUser = existingBots[Math.floor(Math.random() * existingBots.length)];
-        fullName = "Generated Bot"; 
+        console.log(`🤖 Reusing bot: ${botUser.username}`);
     } else {
         let tries = 0;
-        let uniqueUsername = "", uniqueEmail = "";
+        let uniqueUsername = "", uniqueEmail = "", fullName = "";
 
         do {
             const userInfo = await getRealUserInfo();
@@ -121,32 +148,26 @@ async function postBotIdea() {
 
     const gptIdea = await generateIdeaFromGPT();
     if (!gptIdea) return;
-    const industries = ["ecommerce", "health", "education", "tech", "food", "finance", "manufacturing", "fashion"];
-    const stages = ["idea", "prototype", "launched"];
-    const goalsList = ["short", "long", "social"];
-
-    const randomIndustry = industries[Math.floor(Math.random() * industries.length)];
-    const randomStage = stages[Math.floor(Math.random() * stages.length)];
-    const randomGoals = goalsList[Math.floor(Math.random() * goalsList.length)];
 
     const newIdea = new Idea({
         username: botUser.username,
         topic: gptIdea.topic,
         description: gptIdea.description,
-        stage: randomStage,       
+        stage: gptIdea.stage,
         market: gptIdea.market,
-        goals: randomGoals,      
-        fullName: fullName,
+        goals: gptIdea.goals,
+        fullName: gptIdea.fullName, // ✅ Always use GPT-generated name
         email: botUser.email,
         role: gptIdea.role,
         startupName: gptIdea.startupName,
-        industry: randomIndustry, 
+        industry: gptIdea.industry,
     });
 
     await newIdea.save();
     console.log(`✅ GPT idea posted by ${botUser.username}`);
     console.log("🧠 Idea:", gptIdea);
 }
+
 
 
 
