@@ -92,7 +92,6 @@ async function postBotIdea() {
     console.log(`✅ GPT idea posted by ${botUser.username}: ${gptIdea}`);
 }
 
-}
 
 async function generateIdeaFromGPT() {
     try {
