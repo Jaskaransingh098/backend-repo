@@ -42,7 +42,10 @@ router.post('/signup', async (req, res) => {
         if (userExists) return res.status(400).json({ msg: 'User already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword, isPro });
+        const newUser = new User({
+            username, email, password: hashedPassword, isPro, isVerified: false,
+            isBot: false
+        });
         await newUser.save();
 
         const token = jwt.sign({ id: newUser._id }, JWT_SECRET);
@@ -208,6 +211,9 @@ router.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ msg: "Invalid credentials " })
+        }
+        if (!user.isVerified && !user.isBot) {
+            return res.status(401).json({ msg: "Email not verified" });
         }
         const token = jwt.sign({ id: user._id, username: user.username, isPro: user.isPro, activePlan: user.activePlan }, JWT_SECRET, { expiresIn: "1h" });
         res.json({ token });
