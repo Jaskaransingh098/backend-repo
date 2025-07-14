@@ -47,6 +47,7 @@ mongoose.connect(process.env.MONGO_URI, {
 async function getRealUserInfo() {
     try {
         const res = await axios.get("https://randomuser.me/api/");
+        console.log("✅ randomuser.me response:", res.data);
         const user = res.data.results[0];
 
         const fullName = `${user.name.first} ${user.name.last}`;
