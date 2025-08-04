@@ -8,8 +8,8 @@ dotenv.config();
 const { OpenAI } = require("openai");
 
 const openai = new OpenAI({
-    apiKey: process.env.GROQ_API_KEY,          // 🔁 Replace with your Groq key in .env
-    baseURL: "https://api.groq.com/openai/v1", // ✅ This points to Groq’s endpoint
+    apiKey: process.env.GROQ_API_KEY,          
+    baseURL: "https://api.groq.com/openai/v1", 
 });
 
 const User = require("./models/User");
@@ -24,7 +24,7 @@ mongoose.connect(process.env.MONGO_URI, {
     console.error("❌ MongoDB connection error:", err.message);
 });
 
-cron.schedule("0 */4 * * *", async () => {
+cron.schedule("0 */12 * * *", async () => {
     if (process.env.ENABLE_BOTS !== "true") {
         console.log("🛑 Bot posting is disabled (.env)");
         return;
@@ -45,28 +45,6 @@ cron.schedule("0 */4 * * *", async () => {
 //     }
 // })();
 
-// async function getRealUserInfo() {
-//     try {
-//         const res = await axios.get("https://fakerapi.it/api/v1/persons?_quantity=1");
-//         const person = res.data.data[0];
-
-//         const fullName = `${person.firstname} ${person.lastname}`;
-//         const username = `${person.firstname}${person.lastname}${Math.floor(Math.random() * 1000)}`.toLowerCase();
-//         const email = person.email.toLowerCase();
-
-//         console.log("✅ Fetched user from FakerAPI:", fullName, username, email);
-//         return { fullName, username, email };
-//     } catch (err) {
-//         console.error("❌ Failed to fetch user from FakerAPI:", err.message);
-//         console.error("⚠️ Using fallback user");
-//         const fallback = Math.floor(Math.random() * 100000);
-//         return {
-//             fullName: `BotUser${fallback}`,
-//             username: `bot${fallback}`,
-//             email: `bot${fallback}@example.com`,
-//         };
-//     }
-// }
 
 async function getRealUserInfo() {
     try {
